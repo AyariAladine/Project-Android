@@ -7,7 +7,7 @@ data class SignUpRequest(
 )
 
 data class SignUpResponse(
-    val success: Boolean, // Adjust field types based on your API response
+    val success: Boolean,
     val message: String
 )
 
@@ -21,3 +21,17 @@ data class LoginResponse(
     val refreshToken: String,
     val userId: String
 )
+
+data class ForgotPasswordRequest(val email: String)
+data class ForgotPasswordResponse(val message: String, val resetCode: String)
+
+data class VerifyCodeRequest(val email: String ,val code: String)
+
+data class VerifyCodeResponse(val message: String)
+
+data class ResetPasswordRequest(
+    val email: String,
+    val code: String,
+    val newPassword: String
+)
+

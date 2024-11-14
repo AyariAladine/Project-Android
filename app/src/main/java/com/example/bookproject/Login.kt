@@ -1,7 +1,12 @@
 package com.example.bookproject
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,18 +43,19 @@ import com.example.bookproject.DataClass.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 @Composable
 fun Login(navController: NavController) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
 
-    // States for validation feedback
     val isEmailValid = remember { mutableStateOf(false) }
     val isPasswordValid = remember { mutableStateOf(false) }
 
-    // Validation logic
     fun validateEmail(input: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
@@ -60,6 +66,38 @@ fun Login(navController: NavController) {
     }
 
     val context = LocalContext.current
+
+    val googleSignInClient: GoogleSignInClient = remember {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("YOUR_CLIENT_ID") // Replace with your actual client ID
+            .requestEmail()
+            .build()
+        GoogleSignIn.getClient(context, gso)
+    }
+
+    // Launcher for Google Sign-In
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    .getResult(ApiException::class.java)
+                val displayName = account?.displayName
+                Toast.makeText(context, "Connected with Google: $displayName", Toast.LENGTH_SHORT).show()
+            } catch (e: ApiException) {
+                Toast.makeText(context, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Function to launch Google Sign-In
+    fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
+    }
+
+
     fun performLogin(context: Context) {
         if (isEmailValid.value && isPasswordValid.value) {
             val loginRequest = LoginRequest(email.value, password.value)
@@ -70,25 +108,20 @@ fun Login(navController: NavController) {
                         val loginResponse = response.body()
                         val token = loginResponse?.accessToken
                         val userId = loginResponse?.userId
-
                         val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
                         sharedPreferences.edit().putString("token", token).apply()
-
                         Toast.makeText(context, "Login Successful!", Toast.LENGTH_SHORT).show()
-
-                        navController.navigate("home") // Replace "home" with the actual route
+                        navController.navigate("home")
                     } else {
                         Toast.makeText(context, "Login Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                    // Show error if the API call fails
                     Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         } else {
-            // Show error if email or password is invalid
             Toast.makeText(context, "Please enter valid email and password", Toast.LENGTH_SHORT).show()
         }
     }
@@ -108,7 +141,6 @@ fun Login(navController: NavController) {
 
             Row { Image(painter = painterResource(id = R.drawable.feather), contentDescription = "") }
 
-            // Email Row
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier.padding(10.dp),
@@ -142,7 +174,9 @@ fun Login(navController: NavController) {
                             imageVector = Icons.Filled.Check,
                             contentDescription = "Valid email",
                             tint = Color.Green,
-                            modifier = Modifier.size(30.dp).padding(top = 4.dp)
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(top = 4.dp)
                         )
                     } else if (email.value.isNotEmpty()) {
                         Text(
@@ -154,9 +188,11 @@ fun Login(navController: NavController) {
                 }
             }
 
-            // Password Row
             Row(
-                modifier = Modifier.padding(10.dp).height(200.dp).clip(RoundedCornerShape(10.dp)),
+                modifier = Modifier
+                    .padding(10.dp)
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(10.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -198,7 +234,9 @@ fun Login(navController: NavController) {
                             imageVector = Icons.Filled.Check,
                             contentDescription = "Valid password",
                             tint = Color.Green,
-                            modifier = Modifier.size(30.dp).padding(top = 4.dp)
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(top = 4.dp)
                         )
                     } else if (password.value.isNotEmpty()) {
                         Text(
@@ -212,7 +250,6 @@ fun Login(navController: NavController) {
 
             Spacer(modifier = Modifier.padding(20.dp))
 
-            // Buttons Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -237,7 +274,7 @@ fun Login(navController: NavController) {
                     color = Color.LightGray,
                     modifier = Modifier
                         .padding(10.dp)
-                        .clickable { navController.navigate("forgetpassword") }
+                        .clickable { navController.navigate("forget") }
                 )
                 Image(
                     painter = painterResource(id = R.drawable.star),
@@ -245,6 +282,15 @@ fun Login(navController: NavController) {
                     Modifier.size(60.dp)
                 )
             }
+            Row {
+                Image(
+                    painter = painterResource(id = R.drawable.google),
+                    contentDescription = "",
+                    Modifier
+                        .size(60.dp)
+                        .clickable { signInWithGoogle() }
+                )
+            }
+            }
         }
     }
-}

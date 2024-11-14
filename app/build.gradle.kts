@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,11 +71,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation (libs.androidx.foundation)
-    implementation (libs.material3)
-    implementation (libs.material3)
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
-
-
+    implementation(libs.androidx.foundation)
+    implementation(libs.material3)
+    implementation(libs.material3)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.play.services.auth)
 }

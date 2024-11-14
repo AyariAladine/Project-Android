@@ -69,7 +69,6 @@ fun SignUp(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Name Row
             Row(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -114,7 +113,6 @@ fun SignUp(navController: NavController) {
                 }
             }
 
-            // Email Row
             Row(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -159,7 +157,6 @@ fun SignUp(navController: NavController) {
                 }
             }
 
-            // Age Row
             Row(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -204,7 +201,6 @@ fun SignUp(navController: NavController) {
                 }
             }
 
-            // Password Row
             Row(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -287,7 +283,7 @@ fun signUpUser(name:String,email: String, password: String, context: Context, na
         override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
             if (response.isSuccessful) {
                 val body = response.body()
-                if (body != null && body.success == true) {
+                if (body != null && body.success) {
                     Toast.makeText(context, "Sign up failed:", Toast.LENGTH_SHORT).show()
 
                 } else {

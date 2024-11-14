@@ -16,6 +16,7 @@ materialIconsExtended = "1.7.5"
 navigationRuntimeKtx = "2.8.3"
 navigationCompose = "2.8.3"
 onetapcompose = "1.0.14"
+playServicesAuth = "21.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ material3 = { module = "androidx.compose.material3:material3", version.ref = "ma
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 onetapcompose = { module = "com.github.stevdza-san:OneTapCompose", version.ref = "onetapcompose" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "converterGson" }
 
 [plugins]
