@@ -73,11 +73,7 @@ fun SignUp(navController: NavController) {
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Name:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     TextField(
@@ -117,11 +113,6 @@ fun SignUp(navController: NavController) {
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Email:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     TextField(
@@ -161,55 +152,6 @@ fun SignUp(navController: NavController) {
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Age:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    TextField(
-                        value = age.value,
-                        onValueChange = {
-                            age.value = it
-                            isAgeValid.value = validateAge(it)
-                        },
-                        placeholder = { Text(text = "Age") },
-                        isError = !isAgeValid.value && age.value.isNotEmpty(),
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = if (isAgeValid.value) Color.Green else Color.White,
-                            unfocusedIndicatorColor = if (isAgeValid.value) Color.Green else Color.LightGray
-                        ),
-                        modifier = Modifier
-                            .width(330.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                    )
-                    if (isAgeValid.value) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = "Valid age",
-                            tint = Color.Green,
-                            modifier = Modifier.size(24.dp).padding(top = 4.dp)
-                        )
-                    } else if (age.value.isNotEmpty()) {
-                        Text(
-                            text = "Enter a valid age (1-120)",
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Password:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     TextField(

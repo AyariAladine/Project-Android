@@ -36,8 +36,9 @@ fun ForgetPassword(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(color = Color(0xFF1D182F))
                     .padding(paddingValues)
-                    .background(color = Color(0xFF1D182F)),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -78,7 +79,7 @@ fun ForgetPassword(navController: NavController) {
                                 RetrofitClient.instance.forgotPassword(request).enqueue(object : Callback<ForgotPasswordResponse> {
                                     override fun onResponse(call: Call<ForgotPasswordResponse>, response: Response<ForgotPasswordResponse>) {
                                         if (response.isSuccessful) {
-
+                                            println("Success: ${response.body()}")
                                         } else {
                                             println("Error: ${response.errorBody()?.string()}")
                                         }

@@ -139,18 +139,13 @@ fun Login(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Row { Image(painter = painterResource(id = R.drawable.feather), contentDescription = "") }
+            Row { Image(painter = painterResource(id = R.drawable.logo), contentDescription = "") }
 
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Email:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     TextField(
@@ -195,11 +190,6 @@ fun Login(navController: NavController) {
                     .clip(RoundedCornerShape(10.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Password:",
-                    color = Color.White,
-                    modifier = Modifier.width(130.dp)
-                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     TextField(
