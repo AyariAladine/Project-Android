@@ -2,39 +2,25 @@ package com.example.bookproject
 
 import ConfirmCodeScreen
 import ForgetPassword
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material.icons.outlined.Book
-import androidx.compose.material.icons.outlined.Create
-import androidx.compose.material.icons.outlined.Headphones
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 import com.example.bookproject.ui.theme.BookProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -101,14 +87,17 @@ fun AppNavigation() {
                 ProfilePage()
             }
             composable("Pen") {
-                Create()
+                Create(navController)
             }
             composable(
                 "details/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
                 val storyId = backStackEntry.arguments?.getString("id") ?: ""
-                BookDetailsScreen(navController ,storyId = storyId)
+                BookDetailsScreen(navController, storyId)
+            }
+            composable("allStories") {
+                AllStoriesPage(navController)
             }
 
         }
@@ -121,43 +110,54 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar(
         containerColor = Color(0xFF1D182F), // Background color matching the app's theme
-        contentColor = Color.White // White content for visibility
+        contentColor = Color.Gray // White content for visibility
     ) {
         BottomNavItems.forEach { navItem ->
             NavigationBarItem(
                 icon = {
-                    Icon(
-                        imageVector = if (currentRoute?.destination?.route == navItem.route) {
-                            navItem.selectedIcon
-                        } else {
-                            navItem.unselectedIcon
-                        },
-                        contentDescription = navItem.title,
-                        modifier = Modifier.size(28.dp) // Icon size for better visibility
-                    )
+                    // Determine whether to show a GIF (highlighted) or static drawable
+                    if (currentRoute?.destination?.route == navItem.route) {
+                        // Display highlighted GIF for the selected item
+                        AsyncImage(
+                            model = navItem.selectedGif,
+                            contentDescription = navItem.title,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        // Display static drawable for the unselected item
+                        Image(
+                            painter = painterResource(id = navItem.unselectedGif),
+                            contentDescription = navItem.title,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 },
                 label = {
                     Text(
-                        navItem.title,
+                        text = navItem.title,
                         style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.Bold, // Bold font for the labels
-                            color = if (currentRoute?.destination?.route == navItem.route) Color(0xFF76FF03) else Color.LightGray
+                            fontWeight = FontWeight.Bold,
+                            color = if (currentRoute?.destination?.route == navItem.route) {
+                                Color(0xFFBB86FC) // Highlight color for selected item
+                            } else {
+                                Color.LightGray // Default color for unselected items
+                            }
                         )
                     )
                 },
                 selected = currentRoute?.destination?.route == navItem.route,
                 onClick = {
                     navController.navigate(navItem.route) {
-                        // To avoid building up a large back stack
+                        // Avoid building up a large back stack
                         launchSingleTop = true
                         restoreState = true
                     }
-                },
-             // Light gray for unselected items
+                }
             )
         }
     }
 }
+
 
 @Composable
 fun ListenPage() {
@@ -180,18 +180,21 @@ fun ProfilePage() {
 data class BottomNavItem(
     val title: String,
     val route: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val selectedGif: Int,   // Resource ID for selected GIF
+    val unselectedGif: Int  // Resource ID for unselected GIF
 )
+
+
 
 // List of Bottom Navigation items
 val BottomNavItems = listOf(
-    BottomNavItem("Library", "home", Icons.Filled.Book, Icons.Outlined.Book),
-    BottomNavItem("Listen", "listen", Icons.Filled.Headphones, Icons.Outlined.Headphones),
-    BottomNavItem("Create", "Pen", Icons.Filled.Create, Icons.Outlined.Create),
-    BottomNavItem("Watch", "watch", Icons.Filled.Tv, Icons.Outlined.Tv),
-    BottomNavItem("Profile", "profile", Icons.Filled.Person, Icons.Outlined.Person)
+    BottomNavItem("Library", "home", R.drawable.openbook, R.drawable.openbook1),
+    BottomNavItem("Listen", "listen", R.drawable.music, R.drawable.music1),
+    BottomNavItem("Create", "Pen", R.drawable.quill, R.drawable.quill1),
+    BottomNavItem("Watch", "watch", R.drawable.videocamera, R.drawable.videocamera1),
+    BottomNavItem("Profile", "profile", R.drawable.user, R.drawable.user1)
 )
+
 
 
 

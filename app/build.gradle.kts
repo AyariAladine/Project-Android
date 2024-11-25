@@ -78,4 +78,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.play.services.auth)
+    implementation ("io.coil-kt:coil-gif:2.3.0")
 }

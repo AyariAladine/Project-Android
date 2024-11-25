@@ -1,7 +1,5 @@
 package com.example.bookproject
 
-import android.net.Uri
-import android.os.Environment
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,25 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.bookproject.DataClass.RetrofitClient
 import com.example.bookproject.DataClass.Story
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.File
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun LibraryPage(navController: NavController) {
@@ -53,20 +45,17 @@ fun LibraryPage(navController: NavController) {
                 recommendedBooks.clear()
                 recommendedBooks.addAll(recommended)
             } catch (e: Exception) {
-                // Handle error
                 e.printStackTrace()
             }
         }
 
         // Fetch liked stories
         coroutineScope.launch {
-
             try {
                 val liked = RetrofitClient.instance.getStories()
                 continueReadingBooks.clear()
                 continueReadingBooks.addAll(liked)
             } catch (e: Exception) {
-                // Handle error
                 e.printStackTrace()
             }
         }
@@ -101,18 +90,40 @@ fun LibraryPage(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = "Read",
-                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
-                color = Color(0xFFBB86FC),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            BookLazyRow(books = continueReadingBooks) { selectedBook ->
+            // Row to place "Read" and "See All" on the same line, aligning vertically
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically // Align vertically in the center
+            ) {
+                Text(
+                    text = "Read",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                    color = Color(0xFFBB86FC),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // "See All" link on the right side
+                Text(
+                    text = "See All",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                    color = Color(0xFFBB86FC),
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .clickable {
+                            navController.navigate("allStories") // Navigate to the all stories screen
+                        }
+                )
+            }
+
+            // Display only the first 10 books from the continueReadingBooks list
+            BookLazyRow(books = continueReadingBooks.take(10)) { selectedBook ->
                 navController.navigate("details/${selectedBook.id}")
             }
         }
     }
 }
+
 
 @Composable
 fun BookLazyRow(books: List<Story>, onBookClick: (Story) -> Unit) {
@@ -128,40 +139,43 @@ fun BookLazyRow(books: List<Story>, onBookClick: (Story) -> Unit) {
 
 @Composable
 fun BookCard(story: Story, onClick: () -> Unit) {
+    var isFavorite by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
-            .width(140.dp)
+            .width(160.dp)
             .clickable { onClick() }
-            .padding(4.dp),
+            .padding(8.dp)
+            .background(Color(0xFF2D2A44), shape = RoundedCornerShape(16.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
-                .height(180.dp)
+                .height(200.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color.Gray.copy(alpha = 0.5f))
         ) {
-            val context = LocalContext.current
-
-            // Construct the image URL from your local server (e.g., localhost or a local IP)
             val imageUrl = "http://10.0.2.2:3000${story.imageUrl}"
 
-            Log.d("ImageUrl", "Using URL: $imageUrl")
-
-            // Load the image using Coil
-            val painter = rememberAsyncImagePainter(
-                model = imageUrl,  // The URL pointing to the image
-                placeholder = painterResource(id = R.drawable.books),  // Placeholder image while loading
-                error = painterResource(id = R.drawable.book),  // Error image in case of failure
-                fallback = painterResource(id = R.drawable.books)  // Fallback image if URL is null or empty
-            )
+            val painter = rememberAsyncImagePainter(model = imageUrl)
 
             Image(
                 painter = painter,
                 contentDescription = "Story Cover",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
+            )
+
+            // Heart icon toggle
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = "Favorite",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .clickable { isFavorite = !isFavorite },
+                tint = Color(0xFFFF4081) // Match the interface design with this color
             )
         }
 
@@ -173,7 +187,7 @@ fun BookCard(story: Story, onClick: () -> Unit) {
             maxLines = 2,
             color = Color.White,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
 }
